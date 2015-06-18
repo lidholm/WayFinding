@@ -164,19 +164,32 @@ app.controller( 'WayFindingCtrl', function( $scope ) {
 
     $scope.createMainlinesInner = function(mainline) {
     	var lines = [];
-    	var smallLines = $scope.lines;
-    	smallLines.sort(function(a, b) {
-    		distanceA = $scope.distance(mainline[0], a[0]);
-    		distanceB = $scope.distance(mainline[0], b[0]);
-    		return distanceA - distanceB;
-    	});
-    	alert(smallLines);
+    	var smallLines = $scope.sortByDistance(mainline[0], $scope.lines);
+
+    	alert(""+smallLines);
+    }
+    
+    $scope.sortByDistance = function(point, list) {
+    	list = qsort(list, $scope.distance, point);/*(function(a, b) {
+    		return $scope.distance(point, a[0]) - $scope.distance(point, b[0]);
+    	});*/
+    	return list;
     }
     
     $scope.distance = function(pointA, pointB) {
-    	alert("pointA: " + pointA);
-    	alert("pointB: " + pointB);
     	return Math.sqrt(Math.pow(pointA[0] - pointB[0], 2) + Math.pow(pointA[1] - pointB[1], 2)); 
+    }
+    
+    qsort = function (a, func, point) {
+        if (a.length == 0) return [];
+     
+        var left = [], right = [], pivot = func(point, a[0][0]);
+     
+        for (var i = 1; i < a.length; i++) {
+            func(point, a[i][0]) < pivot ? left.push(a[i]) : right.push(a[i]);
+        }
+     
+        return qsort(left, func, point).concat(a[0], qsort(right, func, point));
     }
 });
 
