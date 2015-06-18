@@ -56,7 +56,7 @@ describe('WayFindingCtrl', function() {
     it('sort list of points', function() {
       var $scope = {};
       var controller = $controller('WayFindingCtrl', { $scope: $scope });
-      
+      //TODO: Test doesn't work anymore?
       var point = [1,0];
       var list = new Array();
       list.push([4,0], [9,9]);
