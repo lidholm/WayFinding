@@ -17,7 +17,8 @@ app.controller( 'WayFindingCtrl', function( $scope ) {
 	$scope.load = function(){
 		$scope.log = "";
 		
-        $scope.mainline = document.getElementById('mainline').children[0];
+		$scope.mainlineHolder = document.getElementById('mainline');
+        $scope.mainline = $scope.mainlineHolder.children[0];
         
         $scope.lines = $scope.getSmallLines(document.getElementById('lines').children);
         
@@ -30,7 +31,22 @@ app.controller( 'WayFindingCtrl', function( $scope ) {
         	$scope.log += line + ";   ";
         });
         
-        $scope.createMainlines(mainlineParts);
+        var choppedMainlines = $scope.createMainlines(mainlineParts);
+        
+        angular.forEach(choppedMainlines, function(choppedLines) {
+        	angular.forEach(choppedLines, function(choppedLine) {
+	            var svg = document.getElementsByTagName('svg')[0]; //Get svg element
+	            var newElement = document.createElementNS("http://www.w3.org/2000/svg", 'path'); //Create a path in SVG's namespace
+	            var path = "M " + choppedLine[0][0] + "," + choppedLine[0][1] + " " + choppedLine[1][0] + "," + choppedLine[1][1];
+	            newElement.setAttribute("d", path);
+	            newElement.style.stroke = "#0f0"; 
+	            newElement.style.strokeWidth = "4px";
+	            svg.appendChild(newElement);
+        	});
+        });
+        
+        
+        
         
     }
     
@@ -103,27 +119,6 @@ app.controller( 'WayFindingCtrl', function( $scope ) {
         return directedSmallLines;
     };
     
-    $scope.drawNewMainlines = function(mainlineParts, smallLines) {
-        var mainlines = new Array();
-        
-        $.each(mainlineParts, function(i, part) {
-            var breakpoints = new Array();
-            breakpoints.push(part[0]);
-            breakpoints.push(part[1]);
-            $.each(smallLines, function(j, smallLine) {
-                
-                if ($scope.pointIsOnLine(smallLine[0], part[0], part[1])) {
-                    breakpoints.push(smallLine[0]);
-                }
-                if ($scope.pointIsOnLine(smallLine[1], part[0], part[1])) {
-                    breakpoints.push(smallLine[1]);
-                }
-            });
-            breakpoints = $scope.removeDuplicatesAndSortPoints(breakpoints);
-        });
-        
-    };
-    
     $scope.pointIsOnLine = function(point, lineStart, lineEnd) {
         deltaY = lineEnd[1] - lineStart[1]
         deltaX = lineEnd[0] - lineStart[0];
@@ -143,36 +138,45 @@ app.controller( 'WayFindingCtrl', function( $scope ) {
         return false;
     };
     
-    $scope.removeDuplicatesAndSortPoints = function(breakpoints) {
-        return $scope.unique(breakpoints);
-    };
-    
-    $scope.unique = function(list) {
-        var result = [];
-        $.each(list, function(i, e) {
-            if ($.inArray(e, result) == -1) result.push(e);
-        });
-        return result;
-    }
-    
     $scope.createMainlines = function(mainlineParts) {
     	var lines = [];
     	angular.forEach(mainlineParts, function(part) {
     		var innerLines = $scope.createMainlinesInner(part);
+    		lines.push(innerLines);
     	});
+    	return lines;
     }
 
     $scope.createMainlinesInner = function(mainline) {
     	var lines = [];
-    	var smallLines = $scope.sortByDistance(mainline[0], $scope.lines);
+    	var smallLines = $scope.removeNotOnLine(mainline, $scope.lines);
+    	smallLines = $scope.sortByDistance(mainline[0], smallLines);
+    	var start = mainline[0];
 
-    	alert(""+smallLines);
+    	angular.forEach(smallLines, function(smallLine) {
+    		end = smallLine[0];
+    		lines.push([start, end]);
+    		start = end;
+    	});
+    	if (mainline[1] != start && mainline[1] != end) {
+    		end = mainline[1];
+    		lines.push([start, end]);
+    	}
+    	return lines;
+    }
+    
+    $scope.removeNotOnLine = function(mainline, lines) {
+    	onLines = [];
+    	angular.forEach(lines, function(line) {
+    		if ($scope.pointIsOnLine(line[0], mainline[0], mainline[1])) {
+    			onLines.push(line);
+    		}
+    	});
+    	return onLines;
     }
     
     $scope.sortByDistance = function(point, list) {
-    	list = qsort(list, $scope.distance, point);/*(function(a, b) {
-    		return $scope.distance(point, a[0]) - $scope.distance(point, b[0]);
-    	});*/
+    	list = qsort(list, $scope.distance, point);
     	return list;
     }
     
@@ -188,8 +192,17 @@ app.controller( 'WayFindingCtrl', function( $scope ) {
         for (var i = 1; i < a.length; i++) {
             func(point, a[i][0]) < pivot ? left.push(a[i]) : right.push(a[i]);
         }
-     
-        return qsort(left, func, point).concat(a[0], qsort(right, func, point));
+        var newList = [];
+        var leftSide = qsort(left, func, point);
+        var rightSide = qsort(right, func, point);
+        if (leftSide.length > 0) {
+        	newList = newList.concat(leftSide);
+        }
+        newList.push(a[0]);
+        if (rightSide.length > 0) {
+        	newList = newList.concat(rightSide);
+        }
+        return newList;
     }
 });
 

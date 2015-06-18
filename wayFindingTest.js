@@ -59,9 +59,9 @@ describe('WayFindingCtrl', function() {
       
       var point = [1,0];
       var list = new Array();
-      list.push([[4,0], [9,9]]);
-      list.push([[5,0], [9,9]]);
-      list.push([[3,0], [9,9]]);
+      list.push([4,0], [9,9]);
+      list.push([5,0], [9,9]);
+      list.push([3,0], [9,9]);
 
       var distance = $scope.sortByDistance(point, list);
       var expected = new Array();
@@ -69,8 +69,7 @@ describe('WayFindingCtrl', function() {
       expected.push([4,0], [9,9]);
       expected.push([5,0], [9,9]);
       
-      
-      expect(distance).toEqual(expected);
+      expect(expected).toEqual(distance);
     });
 
   });
