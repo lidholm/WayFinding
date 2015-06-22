@@ -6,10 +6,21 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="wayfinding.js"></script>
     
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $('path').click(function(){
+          var shopName = $(this).attr('id');
+          var elem = document.getElementById('body');
+          angular.element(elem).scope().pathClick(shopName);
+          
+        });
+      });
+    </script>
 </head>
-<body ng-app="wayFindingApp" ng-controller="WayFindingCtrl">
+<body id="body" ng-app="wayFindingApp" ng-controller="WayFindingCtrl">
 
     <div id="theMap" style="width: 500px; height: 400px; background:white;" >
+
 
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
     <svg
@@ -127,47 +138,46 @@
                 id="stadium"
                 d="M 500,450 500,500 450,500 450,450 Z" />
    
-   
+            <g id="i_am_here" >
+                <circle cx="175" cy="500" r="5" stroke="black" stroke-width="0" fill="red" />
+            </g>
    
            <g id="mainline" >
-  
-                <path
-                    style="fill-opacity:0;stroke:#dd2222;stroke-width:4px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                <polyline
+                    style="stroke:#dd2222;stroke-width:4px;fill:none;"
                     id="mainline2"
-                    d="M 175,500 175,175 425,175 425,500" />
+                    points="175,500 175,175 425,175 425,500" />
             </g>
             
             <g id="lines" >
-  
                 <path
                     style="fill-opacity:0;stroke:#ababab;stroke-width:4px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                    id="interspotLine"
+                    id="interSpotLine"
                     d="M 150,400 175,400" />
 
                 <path
                     style="fill-opacity:0;stroke:#ababab;stroke-width:4px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                    id="interspotLine"
+                    id="jcLine"
                     d="M 150,270 175,270" />
 
                 <path
                     style="fill-opacity:0;stroke:#ababab;stroke-width:4px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                    id="interspotLine"
+                    id="clasOhlsonLine"
                     d="M 150,150 175,175" />
 
                 <path
                     style="fill-opacity:0;stroke:#ababab;stroke-width:4px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                    id="interspotLine"
+                    id="kjellochcoLine"
                     d="M 175,450 200,450" />
 
                 <path
                     style="fill-opacity:0;stroke:#ababab;stroke-width:4px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                    id="interspotLine"
+                    id="mcdonaldsLine"
                     d="M 425,175 400,200" />
             </g>
 
         </g>
     </svg>
-
 
     </div>
     <button ng-click="load()">Click</button>

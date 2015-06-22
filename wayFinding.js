@@ -214,4 +214,13 @@ app.controller('WayFindingCtrl', function($scope) {
         }
         return newList;
     }
+    
+    $scope.pathClick = function(name) {
+        if (name.endsWith("Line") || name.endsWith("main")) {
+            return;
+        }
+        alert(name);
+    }
+    
 });
+
