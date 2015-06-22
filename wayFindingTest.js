@@ -56,20 +56,23 @@ describe('WayFindingCtrl', function() {
     it('sort list of points', function() {
       var $scope = {};
       var controller = $controller('WayFindingCtrl', { $scope: $scope });
-      //TODO: Test doesn't work anymore?
+      
       var point = [1,0];
       var list = new Array();
-      list.push([4,0], [9,9]);
-      list.push([5,0], [9,9]);
-      list.push([3,0], [9,9]);
-
+      var lineA = [[4,0], [9,9]];
+      var lineB = [[5,0], [9,9]];
+      var lineC = [[3,0], [9,9]];
+      list.push(lineA);
+      list.push(lineB);
+      list.push(lineC);
+      
       var distance = $scope.sortByDistance(point, list);
       var expected = new Array();
-      expected.push([3,0], [9,9]);
-      expected.push([4,0], [9,9]);
-      expected.push([5,0], [9,9]);
+      expected.push(lineC);
+      expected.push(lineA);
+      expected.push(lineB);
       
-      expect(expected).toEqual(distance);
+      expect(distance).toEqual(expected);
     });
 
   });
