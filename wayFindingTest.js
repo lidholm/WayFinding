@@ -85,6 +85,44 @@ describe('WayFindingCtrl', function() {
 
             expect(distance).toEqual(expected);
         });
-
     });
+
+    describe('change directions on small lines to go from the main line and to the shop', function() {
+        it('changes the direction for one main line', function() {
+            var $scope = {};
+            var controller = $controller('WayFindingCtrl', {
+                $scope : $scope
+            });
+            
+            var list = new Array();
+            var lineA = new Array();
+            lineA.push([2,0]);
+            lineA.push([4,0]);
+            var lineB = new Array();
+            lineB.push([4,0]);
+            lineB.push([6,0])	;
+            list.push(lineA);
+            list.push(lineB);
+
+            var mainlines = new Array();
+            var mainline1 = [[4,-2], [4,4]];
+            mainlines.push(mainline1);
+
+            var directedLines = $scope.changeDirectionOfSmallLines(list, mainlines);
+            
+            var expected = new Array();
+            var lineAOut = new Array();
+            lineAOut.push([4,0]);
+            lineAOut.push([2,0]);
+            var lineBOut = new Array();
+            lineBOut.push([4,0]);
+            lineBOut.push([6,0])	;
+            expected.push(lineAOut);
+            expected.push(lineBOut);
+            
+
+            expect(directedLines).toEqual(expected);
+        });
+    });
+
 });
