@@ -19,19 +19,14 @@ app.controller('WayFindingCtrl', function($scope) {
         $scope.mainlineHolder = document.getElementById('mainline');
         $scope.mainline = $scope.mainlineHolder.children[0];
 
-        $scope.lines = $scope
-                .getSmallLines(document.getElementById('lines').children);
+        $scope.shopLines = $scope.getSmallLines(document.getElementById('lines').children);
 
-        var mainlineParts = $scope
-                .getMainlineParts($scope.mainline.pathSegList);
+        var mainlineParts = $scope.getMainlineParts($scope.mainline.points);
         document.getElementById('mainline').remove();
 
-        $scope.lines = $scope.changeDirectionOfSmallLines($scope.lines,
-                mainlineParts);
-
-        angular.forEach($scope.lines, function(line) {
-            $scope.log += line + ";   ";
-
+        $scope.shopLines = $scope.changeDirectionOfSmallLines($scope.shopLines, mainlineParts);
+        angular.forEach($scope.shopLines, function(line) {
+            console.log("scope.shopLine: " + line);
         });
 
         var choppedMainlines = $scope.createMainlines(mainlineParts);
@@ -39,8 +34,7 @@ app.controller('WayFindingCtrl', function($scope) {
         angular.forEach(choppedMainlines, function(choppedLines) {
             angular.forEach(choppedLines, function(choppedLine) {
                 var svg = document.getElementsByTagName('svg')[0]; // Get svg element
-                var newElement = document.createElementNS(
-                        "http://www.w3.org/2000/svg", 'path'); // Create a path in SVG's namespace
+                var newElement = document.createElementNS("http://www.w3.org/2000/svg", 'path'); // Create a path in SVG's namespace
                 var path = "M " + choppedLine[0][0] + "," + choppedLine[0][1]
                           + " " + choppedLine[1][0] + "," + choppedLine[1][1];
                 newElement.setAttribute("d", path);
@@ -102,11 +96,9 @@ app.controller('WayFindingCtrl', function($scope) {
     	var directedSmallLines = new Array();
     	for( var i = 0; i < smallLines.length; i++) {
     		var smallLine = smallLines[i];
-        	alert("smallLine: " + smallLine);
-            directedSmallLine = new Array();
             for( var j = 0; j < mainlineParts.length; j++) {
+                directedSmallLine = new Array();
             	var mainline = mainlineParts[j];
-            	alert("mainline: " + mainline);
                 if ($scope.pointIsOnLine(smallLine[0], mainline[0], mainline[1])) {
                     directedSmallLine.push(smallLine[0]);
                     directedSmallLine.push(smallLine[1]);
@@ -120,21 +112,18 @@ app.controller('WayFindingCtrl', function($scope) {
                 }
             }
         }
+    	directedSmallLines = $scope.unique(directedSmallLines);
         return directedSmallLines;
     };
 
     $scope.pointIsOnLine = function(point, lineStart, lineEnd) {
-    	alert("lineStart: " + lineStart);
-    	alert("lineEnd  : " + lineEnd);
         deltaY = lineEnd[1] - lineStart[1]
         deltaX = lineEnd[0] - lineStart[0];
 
         if (deltaX == 0) {
             if (point[0] == lineStart[0]) {
-            	alert("true");
                 return true;
             }
-            alert("false");
             return false;
         }
         k = deltaY / deltaX;
@@ -157,7 +146,7 @@ app.controller('WayFindingCtrl', function($scope) {
 
     $scope.createMainlinesInner = function(mainline) {
         var lines = [];
-        var smallLines = $scope.removeNotOnLine(mainline, $scope.lines);
+        var smallLines = $scope.removeNotOnLine(mainline, $scope.shopLines);
         smallLines = $scope.sortByDistance(mainline[0], smallLines);
         var start = mainline[0];
 
@@ -216,6 +205,22 @@ app.controller('WayFindingCtrl', function($scope) {
         return newList;
     }
     
+    $scope.unique = function(list) {
+        var result = [];
+        $.each(list, function(i, elem) {
+            var found = false;
+            $.each(result, function(j, l) {
+                if (elem[0] == l[0] && i != j) {
+                    found = true;
+                }
+            });
+            if (!found) {
+                result.push(elem);
+            }
+        });
+        return result;
+    }
+    
     $scope.pathClick = function(name) {
         if (name.endsWith("Line") || name.endsWith("main")) {
             return;
@@ -223,7 +228,7 @@ app.controller('WayFindingCtrl', function($scope) {
         var line = document.getElementById(name + 'Line').pathSegList;
         start = [line[0].x, line[0].y];
         end = [line[1].x, line[1].y];
-        alert(start + "; "+ end);
+        console.log(start + "; "+ end);
     }
 });
 
